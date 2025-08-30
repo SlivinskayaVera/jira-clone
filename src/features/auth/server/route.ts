@@ -9,7 +9,7 @@ const app = new Hono()
 
     return c.json({ email, password });
   })
-  .post('register', zValidator('json', registerSchema), async (c) => {
+  .post('/register', zValidator('json', registerSchema), async (c) => {
     const { name, email, password } = c.req.valid('json');
 
     return c.json({ name, email, password });

@@ -1,6 +1,7 @@
 'use client';
 
 import z from 'zod';
+import Link from 'next/link';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
@@ -24,7 +25,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import Link from 'next/link';
 import { registerSchema } from '../schemas';
 import { useRegister } from '../api/use-register';
 

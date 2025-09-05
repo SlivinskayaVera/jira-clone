@@ -13,8 +13,7 @@
           "sibling", // Импорты из текущей директории (./)
           "index", // Index imports (./index)
           "object" // Type imports (если разделены)
-        ],
-        "alphabetize": { "order": "asc", "caseInsensitive": true }
+        ]
       }
     ]
   }

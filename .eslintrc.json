@@ -1,3 +1,20 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "plugins": ["import"],
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin", // Node.js built-in modules (если есть)
+          "external", // Сторонние библиотеки
+          "internal", // Внутренние пути (алиасы like @/*)
+          "parent", // Импорты из родительской директории (../)
+          "sibling", // Импорты из текущей директории (./)
+          "index", // Index imports (./index)
+          "object" // Type imports (если разделены)
+        ]
+      }
+    ]
+  }
 }

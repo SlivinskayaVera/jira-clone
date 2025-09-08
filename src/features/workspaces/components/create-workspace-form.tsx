@@ -25,7 +25,7 @@ import { createWorkspaceSchema } from '../schemas';
 import { useCreateWorkspace } from '../api/use-creat-workspace';
 
 interface CreateWorkspaceFormProps {
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {

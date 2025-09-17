@@ -8,6 +8,8 @@ import { ImageIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { cn } from '@/lib/utils';
+
 import { DottedSeparator } from '@/components/dotted-separator';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +28,7 @@ import { createWorkspaceSchema } from '../schemas';
 import { useCreateWorkspace } from '../api/use-creat-workspace';
 
 interface CreateWorkspaceFormProps {
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
@@ -161,6 +163,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                 size='sm'
                 onClick={onCancel}
                 disabled={isPending}
+                className={cn(onCancel ? 'block' : 'invisible')}
               >
                 Cancel
               </Button>

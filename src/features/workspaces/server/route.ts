@@ -13,7 +13,8 @@ import {
   WORKSPACE_ID,
 } from '@/config';
 
-import { createWorkspaceSchema } from '../schemas';
+import { getMember } from '@/features/members/utils';
+import { createWorkspaceSchema, updateWorkspaceSchema } from '../schemas';
 
 const app = new Hono()
   .get('/', sessionMiddleware, async (c) => {
@@ -21,19 +22,19 @@ const app = new Hono()
     const databases = c.get('databases');
 
     const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-      Query.equal('userID', user.$id),
+      Query.equal('userId', user.$id),
     ]);
 
     if (members.total === 0) {
       return c.json({ data: { documents: [], total: 0 } });
     }
 
-    const workspaceIDs = members.documents.map((member) => member.workspaceID);
+    const workspaceIds = members.documents.map((member) => member.workspaceId);
 
     const workspaces = await databases.listDocuments(
       DATABASE_ID,
       WORKSPACE_ID,
-      [Query.orderDesc('$createdAt'), Query.contains('$id', workspaceIDs)]
+      [Query.orderDesc('$createdAt'), Query.contains('$id', workspaceIds)]
     );
 
     return c.json({ data: workspaces });
@@ -74,17 +75,73 @@ const app = new Hono()
         ID.unique(),
         {
           name,
-          userID: user.$id,
+          userId: user.$id,
           imageUrl: uploadedImageUrl,
           inviteCode: generateInviteCode(10),
         }
       );
 
       await databases.createDocument(DATABASE_ID, MEMBERS_ID, ID.unique(), {
-        userID: user.$id,
-        workspaceID: workspace.$id,
+        userId: user.$id,
+        workspaceId: workspace.$id,
         role: MemberRole.ADMIN,
       });
+
+      return c.json({ data: workspace });
+    }
+  )
+  .patch(
+    '/:workspaceId',
+    sessionMiddleware,
+    zValidator('form', updateWorkspaceSchema),
+    async (c) => {
+      const databases = c.get('databases');
+      const storage = c.get('storage');
+      const user = c.get('user');
+
+      const { workspaceId } = c.req.param();
+      const { name, image } = c.req.valid('form');
+
+      const member = await getMember({
+        databases,
+        workspaceId,
+        userId: user.$id,
+      });
+
+      if (!member || member.role !== MemberRole.ADMIN) {
+        return c.json({ error: 'Unauthorize' }, 401);
+      }
+
+      let uploadedImageUrl: string | undefined;
+
+      if (image instanceof File) {
+        const file = await storage.createFile(
+          IMAGES_BUCKET_ID,
+          ID.unique(),
+          image
+        );
+
+        const arrayBuffer = await storage.getFileDownload(
+          IMAGES_BUCKET_ID,
+          file.$id
+        );
+
+        uploadedImageUrl = `data:image/png;base64,${Buffer.from(
+          arrayBuffer
+        ).toString('base64')}`;
+      } else {
+        uploadedImageUrl = image;
+      }
+
+      const workspace = await databases.updateDocument(
+        DATABASE_ID,
+        WORKSPACE_ID,
+        workspaceId,
+        {
+          name,
+          imageUrl: uploadedImageUrl,
+        }
+      );
 
       return c.json({ data: workspace });
     }

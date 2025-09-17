@@ -139,16 +139,33 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                           ref={inputRef}
                           disabled={isPending}
                         />
-                        <Button
-                          type='button'
-                          onClick={() => inputRef.current?.click()}
-                          variant='tertiary'
-                          size='xs'
-                          className='w-fit mt-2'
-                          disabled={isPending}
-                        >
-                          Upload Image
-                        </Button>
+                        {field.value ? (
+                          <Button
+                            type='button'
+                            onClick={() => {
+                              field.onChange(null);
+                              if (inputRef.current) {
+                                inputRef.current.value = '';
+                              }
+                            }}
+                            variant='destructive'
+                            size='xs'
+                            className='w-fit mt-2'
+                          >
+                            Remove Image
+                          </Button>
+                        ) : (
+                          <Button
+                            type='button'
+                            onClick={() => inputRef.current?.click()}
+                            variant='tertiary'
+                            size='xs'
+                            className='w-fit mt-2'
+                            disabled={isPending}
+                          >
+                            Upload Image
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

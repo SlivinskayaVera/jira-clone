@@ -3,6 +3,7 @@
 import { RiAddCircleFill } from 'react-icons/ri';
 import { useRouter } from 'next/navigation';
 
+import { Loader } from 'lucide-react';
 import { useWorkspaceId } from '@/features/workspaces/hooks/use-workspace-id';
 import { useGetWorkspaces } from '@/features/workspaces/api/use-get-workspaces';
 import { WorkspaceAvatar } from '@/features/workspaces/components/workspace-avatar';
@@ -20,7 +21,7 @@ export const WorkspaceSwitcher = () => {
   const router = useRouter();
   const workspaceId = useWorkspaceId();
 
-  const { data: workspaces } = useGetWorkspaces();
+  const { data: workspaces, isPending } = useGetWorkspaces();
   const { open } = useCreateWorkspaceModal();
 
   const onSelect = (id: string) => {
@@ -34,11 +35,17 @@ export const WorkspaceSwitcher = () => {
         <RiAddCircleFill
           onClick={open}
           className='size-5 text-neutral-500 cursor-pointer hover:opacity-75 transition'
+          title='Create a new workspace'
         />
       </div>
-      <Select onValueChange={onSelect} value={workspaceId}>
+      <Select onValueChange={onSelect} value={workspaceId} disabled={isPending}>
         <SelectTrigger className='w-full bg-neutral-200 font-medium p-1'>
           <SelectValue placeholder='No workspaces selected' />
+          {isPending && (
+            <div className='size-10 rounded-full flex items-center justify-center bg-neutral-200 border border-neutral-100'>
+              <Loader className='size-4 animate-spin text-muted-foreground' />
+            </div>
+          )}
         </SelectTrigger>
         <SelectContent>
           {workspaces?.documents.map((workspace) => (

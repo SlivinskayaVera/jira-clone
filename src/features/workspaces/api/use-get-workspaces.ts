@@ -7,6 +7,8 @@ export const useGetWorkspaces = () => {
     queryFn: async () => {
       const response = await client.api.workspaces.$get();
 
+      // test reset --soft
+      
       if (!response.ok) {
         throw new Error('Failed to fetch workspaces');
       }

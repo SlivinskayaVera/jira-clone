@@ -7,7 +7,7 @@ export const useGetWorkspaces = () => {
     queryFn: async () => {
       const response = await client.api.workspaces.$get();
 
-      // commit rewrite amend 
+      // commit rewrite amend try again
 
       if (!response.ok) {
         throw new Error('Failed to fetch workspaces');

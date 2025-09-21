@@ -2,7 +2,7 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 
-import { Client, Account } from 'node-appwrite';
+import { Client, Account, Databases } from 'node-appwrite';
 import { AUTH_COOKIE } from '@/features/auth/constants';
 
 export async function createSessionClient() {
@@ -22,9 +22,9 @@ export async function createSessionClient() {
     get account() {
       return new Account(client);
     },
-    // get databases() {
-    //   return new Databases(client)
-    // }
+    get databases() {
+      return new Databases(client);
+    },
   };
 }
 

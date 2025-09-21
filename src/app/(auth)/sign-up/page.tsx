@@ -1,13 +1,13 @@
 import { redirect } from 'next/navigation';
 
-import { getCurrent } from '@/features/auth/server/actions';
+import { getCurrent } from '@/features/auth/server/queries';
 import SignUpCard from '@/features/auth/components/sign-up-card';
 
 const SingUpPage = async () => {
   const user = await getCurrent();
 
   if (user) redirect('/');
-  
+
   return <SignUpCard />;
 };
 

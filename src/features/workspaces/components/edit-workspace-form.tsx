@@ -4,10 +4,11 @@ import { z } from 'zod';
 import { useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ArrowLeftIcon, ImageIcon } from 'lucide-react';
+import { ArrowLeftIcon, CopyIcon, ImageIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 import { DottedSeparator } from '@/components/dotted-separator';
@@ -29,6 +30,7 @@ import { updateWorkspaceSchema } from '../schemas';
 import { Workspace } from '../server/types';
 import { useUpdateWorkspace } from '../api/use-update-workspace';
 import { useDeleteWorkspace } from '../api/use-delete-workspace';
+import { useResetInviteCode } from '../api/use-update-invite-code';
 
 interface EditWorkspaceFormProps {
   onCancel?: () => void;
@@ -44,6 +46,8 @@ export const EditWorkspaceForm = ({
     useUpdateWorkspace();
   const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } =
     useDeleteWorkspace();
+  const { mutate: resetInviteCode, isPending: isUpdatingInviteCode } =
+    useResetInviteCode();
 
   const [DeleteDialog, confirmDelete] = useConfirm(
     'Delete Workspace',
@@ -51,7 +55,14 @@ export const EditWorkspaceForm = ({
     'destructive'
   );
 
-  const isPending = isUpdatingWorkspace || isDeletingWorkspace;
+  const [ResetInviteCodeDialog, confirmResetInviteCode] = useConfirm(
+    'Reset invite link',
+    'This will invalidate the current invite link.',
+    'destructive'
+  );
+
+  const isPending =
+    isUpdatingWorkspace || isDeletingWorkspace || isUpdatingInviteCode;
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -75,6 +86,23 @@ export const EditWorkspaceForm = ({
       {
         onSuccess: () => {
           window.location.href = '/';
+        },
+      }
+    );
+  };
+
+  const handleResetInviteCode = async () => {
+    const ok = await confirmResetInviteCode();
+
+    if (!ok) return;
+
+    resetInviteCode(
+      {
+        param: { workspaceId: initialValues.$id },
+      },
+      {
+        onSuccess: () => {
+          router.refresh();
         },
       }
     );
@@ -105,9 +133,18 @@ export const EditWorkspaceForm = ({
     }
   };
 
+  const fullInviteCodeLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+
+  const handleCopyInviteLink = () => {
+    navigator.clipboard
+      .writeText(fullInviteCodeLink)
+      .then(() => toast.success('Invite link copied to clipboard'));
+  };
+
   return (
     <div className='flex flex-col gap-y-4'>
       <DeleteDialog />
+      <ResetInviteCodeDialog />
       <Card className='w-full h-full border-none shadow-none'>
         <CardHeader className='flex flex-row items-center gap-x-7 p-7 space-y-0'>
           <Button
@@ -246,6 +283,40 @@ export const EditWorkspaceForm = ({
           </Form>
         </CardContent>
       </Card>
+
+      <Card className='w-full h-full border-none shadow-none'>
+        <CardContent className='p-7'>
+          <div className='flex flex-col'>
+            <h3 className='font-bold'>Invite Members</h3>
+            <p className='text-sm text-muted-foreground'>
+              Use the invite link to add members to your workspace.
+            </p>
+            <div className='mt-4'>
+              <div className='flex items-center gap-x-2'>
+                <Input disabled value={fullInviteCodeLink} />
+                <Button
+                  onClick={handleCopyInviteLink}
+                  variant='secondary'
+                  className='size-12'
+                >
+                  <CopyIcon className='size-5' />
+                </Button>
+              </div>
+            </div>
+            <Button
+              className='mt-6 w-fit ml-auto'
+              size='sm'
+              variant='primary'
+              type='button'
+              disabled={isPending}
+              onClick={handleResetInviteCode}
+            >
+              Reset invite link
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className='w-full h-full border-none shadow-none'>
         <CardContent className='p-7'>
           <div className='flex flex-col'>

@@ -20,7 +20,7 @@ const app = new Hono()
         workspaceId: z.string(),
         projectId: z.string().nullish(),
         assigneeId: z.string().nullish(),
-        status: z.nativeEnum(TaskStatus),
+        status: z.nativeEnum(TaskStatus).nullish(),
         search: z.string().nullish(),
         dueDate: z.string().nullish(),
       })
@@ -45,7 +45,7 @@ const app = new Hono()
 
       const query = [
         Query.equal('workspaceId', workspaceId),
-        Query.orderDesc('$createAt'),
+        Query.orderDesc('$createdAt'),
       ];
 
       if (projectId) {

@@ -126,7 +126,8 @@ export const CreateTaskForm = ({
                       <FormMessage />
                       <SelectContent>
                         {memberOptions.map((member) => (
-                          <SelectItem key={member.id} value={member.name}>
+                          // точно id?
+                          <SelectItem key={member.id} value={member.id}>
                             <div className='flex items-center gap-x-2'>
                               <MemberAvatar
                                 name={member.name}
@@ -194,7 +195,8 @@ export const CreateTaskForm = ({
                       <FormMessage />
                       <SelectContent>
                         {projectOptions.map((project) => (
-                          <SelectItem key={project.id} value={project.name}>
+                          // точно id?
+                          <SelectItem key={project.id} value={project.id}>
                             <div className='flex items-center gap-x-2'>
                               <ProjectAvatar
                                 name={project.name}
